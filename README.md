@@ -1,1 +1,1 @@
-# research-develpoment
+# [연구 개발 노트]
