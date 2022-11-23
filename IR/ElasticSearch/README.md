@@ -1,57 +1,24 @@
-## BM25 (Best Match 25)
+## 1. ElasticSearch
 
-### (1) 개념
+ElasticSearch는 Apache Lucene(아파치 루씬) 기반의 Java 오픈소스 분산 검색 엔진
 
-* 주어진 쿼리에 대해 문서와의 연관성을 평가하는 랭킹 함수로 사용되는 알고리즘으로, 검색 알고리즘 중 SOTA로 알려짐
-* BM25 알고리즘은 기존에 IR(information retrieval)분야에서 사용되는 TF-IDF 알고리즘을 변형 시킨 형태
-* ElasticSearch 5.0부터 기본(default) 유사도 알고리즘으로 BM25 알고리즘을 채택
+ElasticSearch를 통해 루씬 라이브러리를 단독으로 사용할 수 있게 되었으며, 방대한 양의 데이터를 신속하게, 거의 실시간(NRT, Near Real Time)으로 저장, 검색, 분석이 가능
 
-### (2) TF (Term Frequency)
-![image](https://user-images.githubusercontent.com/87981867/190080374-28755046-05c5-4a83-94d9-dc31f32a5060.png)
+Elasticsearch는 검색을 위해 단독으로 사용되기도 하며, ELK(Elasticsearch / Logstatsh / Kibana)스택으로 사용
 
-> *freq*: 문서에 매칭된 키워드 수
 
-> *k1*: 1.2(default)
+- **Logstash**
+  : 다양한 소스( DB, csv파일 등 )의 로그 또는 트랜잭션 데이터를 수집, 집계, 파싱하여 Elasticsearch로 전달
+- **ElasticSearch**
+  : Logstash로부터 받은 데이터를 검색 및 집계를 하여 필요한 관심 있는 정보를 획득
+- **Kibana**
+  : Elasticsearch의 빠른 검색을 통해 데이터를 시각화 및 모니터링
 
-> *b*: 0.75(default) 
+![image](https://user-images.githubusercontent.com/87981867/203449976-0582c27c-ee9b-4b56-860b-af99f3b8a482.png)
 
-> *dl*: 실제 문서가 검색된 문서의 길이
+## 2. ElasticSearch와 관계형 DB 비교
 
-> *avgdl*: 평균 필드의 길이
+흔히 사용하고 있는 관계형 DB는 ElasticSearch에서 각각 다음과 같이 대응
 
-* 특정 용어가 하나의 문서에 얼마나 많이 등장했는지 의미하는 지표
-* 일반적으로 특정 용어가 문서에서 많이 등장한다면 그 용어는 문서와 연관되어 있을 확률이 높음 
-
-### (3) IDF (Inversed Document Frequency)
-![image](https://user-images.githubusercontent.com/87981867/190080438-efd7b126-240d-4e83-b43d-4160165e8669.png)
-
-> *n*: 문서에 나타난 키워드 수
-
-> *N*: 전체 문서의 수
-
-* 특정 용어가 얼마나 자주 등장했는지 의미하는 지표
-* 문서 내에서 발생 빈도가 적을수록 가중치를 높게 줌
-* 문서 안에서 용어가 몇 번 등장하는지는 고려하지 않고, 전체 문서 중 해당 용어가 등장하는 문서 수를 고려
-
-### (4) Score 계산
-![image](https://user-images.githubusercontent.com/87981867/190080461-231ca613-2f81-4e8e-baee-3275252d72ec.png)
-
-### (5) TF-IDF vs BM25
-
-#### 1) TF
-
-![image](https://user-images.githubusercontent.com/87981867/190080485-74b445f9-0f39-4397-ad45-c17b8cbfb6ee.png)
-
-* TF에서는 단어 빈도가 높아질수록 검색 점수도 지속적으로 높아지는 반면, BM25에서는 특정 값으로 수렴
-
-#### 2) IDF
-
-![image](https://user-images.githubusercontent.com/87981867/190080504-37322644-42ef-424f-aa78-41f97c85ef32.png)
-
-* BM25에서는 DF가 높아지면 검색 점수가 0으로 급격히 수렴하므로, 불용어(stop words)가 검색 점수에 영향을 덜 미침
-
-#### 3) norm
-
-![image](https://user-images.githubusercontent.com/87981867/190080536-5b9bdc0a-ece2-441f-9bf0-0a039f5c7fa3.png)
-
-* BM25에서는 문서의 평균 길이(avgdl)를 계산에 사용하며, 문서의 길이가 검색 점수에 영향을 덜 미침
+![image](https://user-images.githubusercontent.com/87981867/203450082-a526a440-e804-40ef-9d7d-64bc88a30e2e.png)
+![image](https://user-images.githubusercontent.com/87981867/203450096-ffa101d5-836b-4b10-aad6-3dfc56635dd0.png)
