@@ -1,3 +1,5 @@
+# ElasticSearch 기본 개념
+
 ## 1. ElasticSearch
 
 ElasticSearch는 Apache Lucene(아파치 루씬) 기반의 Java 오픈소스 분산 검색 엔진
