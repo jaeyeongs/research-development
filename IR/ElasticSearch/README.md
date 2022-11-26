@@ -119,3 +119,20 @@ Replica는 또 다른 형태의 **Shard**라고 할 수 있음
 
 ![image](https://user-images.githubusercontent.com/87981867/203902360-c58a52bb-e5ac-4863-af63-25601c04c657.png)
 
+## 5. 역색인(Inverted Index)
+
+책에서 맨 앞에 볼 수 있는 목차가 index, 책 맨 뒤에 키워드마다 찾아볼 수 있도록 찾아보기가 inverted index
+
+Elasticsearch는 텍스트를 파싱해서 검색어 사전을 만든 다음에 inverted index 방식으로 텍스트를 저장
+
+![image](https://user-images.githubusercontent.com/87981867/204070510-dcb3b40f-6a0d-4a80-8883-c0c84640c7da.png)
+![image](https://user-images.githubusercontent.com/87981867/204070514-904a7712-05ba-4c28-abab-bc0dad28916b.png)
+
+> "Lorem Ipsum is simply dummy text of the printing and typesetting industry"
+
+
+이 문장을 모두 파싱해서 각 단어들( Lorem, Ipsum, is, simply .... )을 저장하고,
+
+대문자는 소문자 처리하고, 유사어도 체크 등의 작업을 통해 텍스트를 저장
+
+때문에 RDBMS보다 전문검색(Full Text Search)에 빠른 성능을 보임
