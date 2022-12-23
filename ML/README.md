@@ -2,7 +2,6 @@
 
 ## 1. User workers in DataLoaders
 
----
 
 ```
 DataLoader(dataset, num_workers=8)
@@ -19,7 +18,6 @@ DataLoader(dataset, num_workers=8)
 
 ## 2. Pin memory
 
----
 
 ```
 DataLoader(dataset, pin_memory=True)
@@ -47,8 +45,6 @@ DataLoader(dataset, pin_memory=True)
 
 ## 3. Avoid CPU to GPU transfers or vice-versa
 
----
-
 ```
 # BAD
 .cpu()
@@ -66,8 +62,6 @@ DataLoader(dataset, pin_memory=True)
 
 ## 4. Construct tensors directly on GPU
 
----
-
 ```
 # BAD
 t = tensor.rand(2, 2).cuda()
@@ -81,7 +75,6 @@ t = tensor.rand(2, 2, device=torch.device('cuda'))
 
 ## 5. Use DistributedDataParallel not DataParallel
 
----
 
 - 여러 개의 GPU 를 이용할 때 도움이 되는 방법으로 DataParallel(DP)이 아닌 DistributedParellel(DDP) 을 사용
 - **DP** 방식은 multi-threading 이고 **DDP** 방식은 multi-processing이다.
@@ -103,8 +96,6 @@ Trainer(distributed_backend='ddp', gpus=8)
 
 ## 6. Use 16-bit precision
 
----
-
 - 32-bit로 구성된 데이터를 16-bit 로 변환하여 사용
 - 32-bit 데이터를 16-bit 로 변환하면 데이터가 차지하는 메모리 용량이 절반으로 줄어 모델 학습의 배치 사이즈를 두 배로 늘려서 학습 속도를 더 빠르게 향상시킬 수가 있음
 - 또한 특정한 GPU 모델(C100, 2080Ti)은 16-bit 계산에 특화되어 있기도 하다고 하여 32-bit 계산을 시행할 때보다 16-bit 데이터를 계산할 때 속도가 3배에서 많게는 8배까지도 빨라질 수 있음
@@ -121,8 +112,6 @@ Note) pytorch 1.6 이전 버전에서는 Nvidia Apex 도 함께 설치해주어�
 ```
 
 ## 7. Profile your code
-
----
 
 - 코드가 실행한 프로세스가 어떻게 돌아가고 있는지를 자세히 분석하여 보여주는 것
 - 작업마다 시간이 얼마나 걸렸고 메모리를 얼마나 차지했는지 등을 한눈에 보여주니까, 모델의 학습 속도가 너무 느리다고 생각될 때 이 프로파일링을 이용하면 어디서 병목이 발생하고 있는지 쉽게 찾아낼 수가 있을 것
