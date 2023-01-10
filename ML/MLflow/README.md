@@ -22,32 +22,30 @@
 
 ### (4) MLflow Model Registry
 
-- MLflow 모델의 전체 Lifecycle을 공동으로 관리하기 위한 모델 저장소, API, UI
+- MLflow 모델의 전체 Lifecycle을 공동으로 관리하기 위한 모델 저장소
 
 ## 사용 예시
 
 ### (1) 설치방법
 
-```jsx
+```python
 pip install mlflow
 ```
 
 ### (2) 라이브러리 구성
 
-<aside>
-💡 1) main.py
-
+```
+💡
+1) main.py
 : 전체 코드를 실행하는 main을 담당하며, model.py에서 넘겨온 model 정보 등을 받아서 MLflow에서 제공해주는 metric,  파라미터, 모델 등에 정보를 저장하여 관리될 수 있도록 함
 
 2) model.py
-
 : 머신러닝 모델을 가지고 데이터를 훈련시키고 훈련된 모델과 모델 하이퍼파라미터 정보를 저장함
-
-</aside>
+```
 
 ### (3) 실행방법 및 결과
 
-```jsx
+```python
 mlflow ui
 >>> Starting gunicorn 20.1.0
 >>> Listening at: http://127.0.0.1:5000
@@ -55,26 +53,23 @@ mlflow ui
 >>> Booting worker with pid: 4122
 ```
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/63181c12-70bb-47a5-95e3-0a066e7a3640/Untitled.png)
+![image](https://user-images.githubusercontent.com/87981867/211469295-aafebd92-23f5-4948-bbe8-18ad346edfb1.png)
 
 - start time, user, source, version, models, metrics 등을 확인할 수 있음
-- 
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/0a939614-02c3-4376-b2ad-3b7c8c4c7578/Untitled.png)
-
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/e4839d97-29a0-41cf-bd09-163be45948b1/Untitled.png)
+![image](https://user-images.githubusercontent.com/87981867/211469320-6e57c15e-fb60-4b1d-9718-cb55df6c0678.png) ![image](https://user-images.githubusercontent.com/87981867/211469337-bd44e782-149e-4727-93e1-8f7bca5d3e20.png)
 
 - 모델에 사용된 파라미터 값과 사용된 모델의 metric(accuracy, f1-score, precison 등) 결과 확인 가능
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/01841541-88c6-42e7-a749-680c8a6ea9e2/Untitled.png)
+![image](https://user-images.githubusercontent.com/87981867/211469401-e785d2bb-739d-4d71-89b5-6fdd7f395711.png)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8fa37aa4-88d8-4725-b1ef-59d70f8ab281/Untitled.png)
+![image](https://user-images.githubusercontent.com/87981867/211469416-c2acb15e-333c-4291-808a-0a255e355f79.png)
 
 - prediction으로 만들 수 있는 방법에 대한 설명과 머신러닝 모델 파일 내용 확인 가능
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/47cdb1e3-5f05-4839-b67e-b877d62f9f3f/Untitled.png)
+![image](https://user-images.githubusercontent.com/87981867/211469453-3db783d6-194d-42c1-96d5-0721cc4319d7.png)
 
-![Untitled](https://s3-us-west-2.amazonaws.com/secure.notion-static.com/8de5e963-66dd-4fc6-854a-b9a73cf668d3/Untitled.png)
+![image](https://user-images.githubusercontent.com/87981867/211469466-d849989b-ad81-4836-bc4f-6227e0fc0e15.png)
 
 - 딥러닝 모델 또한 모델 정보, metric, prediction 정보 확인 가능
 
