@@ -1,35 +1,38 @@
-![image](https://user-images.githubusercontent.com/87981867/211442559-94926bcf-5c95-4df2-b819-000b2403905e.png)
+![image](https://user-images.githubusercontent.com/87981867/212082015-7755192f-49cb-460b-af89-475378aeb9ed.png)
 
-## MLflow란?
+## BentoML이란?
 
-- MLflow는 머신러닝 모델의 실험을 추적하고 모델을 공유 및 배포할 수 있도록 지원하는 라이브러리
-- 머신러닝 학습과 관련된 전반적인 Lifecycle을 지원해주는 라이브러리
+- 머신러닝 모델을 만들면 해당 모델을 쉽게 배포 및 테스트를 할 수 있게 해주는 라이브러리
+- 간단한 코드로도 쉽게 API 서버를 구성할 수 있고, Dockerfile 제공과 함께 Docker Image를 간편하게 만들 수 있게 함
 
 ## 주요 기능 및 특징
 
-### (1) MLflow Tracking
+### (1) ML 프레임워크
 
-- 머신러닝 모델을 학습시킬 때 생기는 각종 파라미터 관리와 머신러닝 모델 훈련이 끝난 후 metric의 결과 등을 logging하고 그 기록 결과를 Web UI로 확인 가능
+- 다양한 머신러닝 프레임워크들을 지원(scikit-learn, tensorflow, pytorch, xgboost 등)
 
-### (2) MLflow Projects
+### (2) Yatai 서버
 
-- 생성한 모델을 재생성 하고 실행할 수 있도록 코드 패키지 형식으로 지원
-- 생성된 모델 환경을 재사용할 수 있음
+- Yatai 서버를 실행하여 저장된 모델, 배포된 모델을 보여줌과 동시에 관리도 가능
 
-### (3) MLflow Models
+### (3) 컨테이너화
 
-- 동일한 모델을 Docker, Apache Spark, AWS 등의 인프라에서 쉽게 배치할 수 있도록 지원
+- docker 컨테이너 생성 및 docker image 생성 가능
 
-### (4) MLflow Model Registry
+### (4) 다양한 파일 생성
 
-- MLflow 모델의 전체 Lifecycle을 공동으로 관리하기 위한 모델 저장소
+- 도커 파일, 학습 모델 정보, environment 등 모델 배포에 필요한 여러 파일을 자동으로 생성
+
+### (5) API 생성
+
+- 생성된 도커 이미지를 활용해서 도커 명령어를 통해 API serving이 가능
 
 ## 사용 예시
 
 ### (1) 설치방법
 
 ```python
-pip install mlflow
+pip install bentoml
 ```
 
 ### (2) 라이브러리 구성
@@ -37,40 +40,48 @@ pip install mlflow
 ```
 💡
 1) main.py
-: 전체 코드를 실행하는 main을 담당하며, model.py에서 넘겨온 model 정보 등을 받아서 MLflow에서 제공해주는 metric,  파라미터, 모델 등에 정보를 저장하여 관리될 수 있도록 함
+: 전체 코드를 실행하는 main을 담당하며, 모델을 return 함 또한 가져온 모델을 BentoML에 packing 가능(*packing : 머신러닝 또는 딥러닝 모델을 저장하는 개념) 
 
-2) model.py
-: 머신러닝 모델을 가지고 데이터를 훈련시키고 훈련된 모델과 모델 하이퍼파라미터 정보를 저장함
+2) bentoml_process.py
+: 생성한 모델을 입력 받아 classifier 객체를 생성해서 packing을 진행한 후 이러한 환경값들을 저장하여 docker 등의 다양한 파일을 생성
+
+3) classifier.py
+: 각종 bentoml 기능을 담고 있는 파일이며, BentoService를 상속하여 사용(실행 시 Web UI 화면 호출)
 ```
 
 ### (3) 실행방법 및 결과
 
 ```python
-mlflow ui
->>> Starting gunicorn 20.1.0
->>> Listening at: http://127.0.0.1:5000
->>> Using worker: sync
->>> Booting worker with pid: 4122
+bentoml serve {classifier}:{version}
+>>> Running on http://127.0.0.1:5000
 ```
 
-![image](https://user-images.githubusercontent.com/87981867/211469295-aafebd92-23f5-4948-bbe8-18ad346edfb1.png)
+![image](https://user-images.githubusercontent.com/87981867/212082268-949a4781-5cfb-40d1-9d5b-14b07cc29d82.png)
 
-- start time, user, source, version, models, metrics 등을 확인할 수 있음
+- 이 화면을 통해서 모델에서 나온 결과값을 확인 가능
 
-![image](https://user-images.githubusercontent.com/87981867/211469320-6e57c15e-fb60-4b1d-9718-cb55df6c0678.png) ![image](https://user-images.githubusercontent.com/87981867/211469337-bd44e782-149e-4727-93e1-8f7bca5d3e20.png)
+![image](https://user-images.githubusercontent.com/87981867/212082331-3ae18fbb-60a2-4f87-a5aa-49f4f6135e53.png)
 
-- 모델에 사용된 파라미터 값과 사용된 모델의 metric(accuracy, f1-score, precison 등) 결과 확인 가능
+- dockerfile, requirements, setup 등 배포에 필요한 여러 파일들이 자동으로 생성 됨
 
-![image](https://user-images.githubusercontent.com/87981867/211469401-e785d2bb-739d-4d71-89b5-6fdd7f395711.png)
+![image](https://user-images.githubusercontent.com/87981867/212082391-02b53450-9b18-4ff9-9851-12723383d86e.png)
 
-![image](https://user-images.githubusercontent.com/87981867/211469416-c2acb15e-333c-4291-808a-0a255e355f79.png)
+- 도커 빌드를 통해 도커 이미지 생성 가능
 
-- prediction으로 만들 수 있는 방법에 대한 설명과 머신러닝 모델 파일 내용 확인 가능
+```python
+docker run -p 5000:5000 {dockerimage}
+```
 
-![image](https://user-images.githubusercontent.com/87981867/211469453-3db783d6-194d-42c1-96d5-0721cc4319d7.png)
+- 도커 이미지를 활용하여 BentoML API Serving이 가능
+- docker run 명령어로 실행하고 port만 열어주면 간단히 실행 가능
 
-![image](https://user-images.githubusercontent.com/87981867/211469466-d849989b-ad81-4836-bc4f-6227e0fc0e15.png)
+```python
+bentoml yatai-service-start {classifier}:{version}
+>>> Running on http://127.0.0.1:5000
+```
 
-- 딥러닝 모델 또한 모델 정보, metric, prediction 정보 확인 가능
+![image](https://user-images.githubusercontent.com/87981867/212082481-33922931-973f-4808-8ed4-0548df490b6b.png)
 
-출처 : [https://lsjsj92.tistory.com/623](https://lsjsj92.tistory.com/623)
+- Yatai를 실행하면 그림과 같이 Web UI를 활용하여 머신러닝 및 딥러닝 모델 관리 가능
+
+출처 : [https://lsjsj92.tistory.com/621](https://lsjsj92.tistory.com/621)
