@@ -12,18 +12,19 @@
 
 ## 2. MRC의 종류
 
-### Extractive Answer Datasets**
+### Extractive Answer Datasets
 
 - 질의 (question)에 대한 답이 항상 주어진 지문 (context)의 segment (or span)로 존재
+
 ex) Span Extraction: SQuAD, KorQuAD, NewsQA, Natural Questions, etc
 
-### Descriptive/Narrative Answer Datasets**
+### Descriptive/Narrative Answer Datasets
 
 - 답이 지문 내에서 추출한 span이 아니라, 질의를 보고 생성 된 sentence (or free form)의 형태
 
 ex) MS MARCO (Bajaj et al., 2016), Narrative QA
 
-### Multiple choice Datasets**
+### Multiple choice Datasets
 
 - 질의에 대한 답을 여러 개의 answer candidates 중 하나로 고르는 형태
 
