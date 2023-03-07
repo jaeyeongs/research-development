@@ -15,6 +15,8 @@
 #### Model
 - [ElectraSpacer](https://github.com/jaeyeongs/research-develpoment/tree/main/Model/ElectraSpacer)
 - [BM25-KoSBERT](https://github.com/jaeyeongs/research-develpoment/tree/main/Model/BM25-KoSBERT)
+- [Tab-Transformer]()
+
 
 #### 형태소 분석
 - [KoNLPy](https://github.com/jaeyeongs/research-develpoment/tree/main/%ED%98%95%ED%83%9C%EC%86%8C%20%EB%B6%84%EC%84%9D/konlpy)
@@ -24,3 +26,4 @@
 - [PyTorch](https://github.com/jaeyeongs/research-develpoment/tree/main/ML/PyTorch)
 - [MLflow](https://github.com/jaeyeongs/research-develpoment/tree/main/ML/MLflow)
 - [BentoML](https://github.com/jaeyeongs/research-develpoment/tree/main/ML/BentoML)
+- [Optuna]()
