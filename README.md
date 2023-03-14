@@ -26,4 +26,4 @@
 - [PyTorch](https://github.com/jaeyeongs/research-develpoment/tree/main/ML/PyTorch)
 - [MLflow](https://github.com/jaeyeongs/research-develpoment/tree/main/ML/MLflow)
 - [BentoML](https://github.com/jaeyeongs/research-develpoment/tree/main/ML/BentoML)
-- [Optuna]()
+- [Optuna](https://github.com/jaeyeongs/research-development/tree/main/ML/Optuna)
