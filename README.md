@@ -15,7 +15,6 @@
 #### Model
 - [ElectraSpacer](https://github.com/jaeyeongs/research-develpoment/tree/main/Model/ElectraSpacer)
 - [BM25-KoSBERT](https://github.com/jaeyeongs/research-develpoment/tree/main/Model/BM25-KoSBERT)
-- [Tab-Transformer]()
 
 
 #### 형태소 분석
