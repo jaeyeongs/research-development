@@ -1,86 +1,233 @@
-# MRC(Machine Reading Comprehension)
+# SQuAD
 
+**(1) SQuAD 1.0**
 
-## 1. MRC 개념
+- SQuAD (Stanford Question Answering Dataset) 1.0은 스탠포드 대학교에서 제공하는 질문-답변 데이터셋
+- 웹에서 수집된 500개 이상의 Wikipedia 문서에서 100,000개 이상의 질문-답변 쌍
 
-### MRC (Machine Reading Comprehension)
+```json
+# SQuAD 1.0
+{
+    "data": [
+        {
+            "paragraphs": [
+                {
+                    "context": "Super Bowl 50 was an American football game...",
+                    "qas": [
+                        {
+                            "answers": [
+                                {
+                                    "answer_start": 177,
+                                    "text": "Denver Broncos"
+                                }
+                            ],
+                            "question": "Which NFL team represented the AFC at Super Bowl 50?",
+                            "id": "56be4db0acb8001400a502ec"
+                        },
+                        {
+                            "answers": [
+                                {
+                                    "answer_start": 249,
+                                    "text": "Carolina Panthers"
+                                }
+                            ],
+                            "question": "Which NFL team represented the NFC at Super Bowl 50?",
+                            "id": "56be4db0acb8001400a502ed"
+                        },
+                        ...
+                    ]
+                }
+            ],
+            "title": "Super_Bowl_50"
+        }
+    ],
+    "version": "1.0"
+}
+```
 
-: 기계 독해(Machine Reading Comprehension)란 주어진 지문(context)을 이해하고, 주어진 질의 (Query/Question)의 답변을 추론하는 문제
+**(2) SQuAD 2.0**
 
-![image](https://user-images.githubusercontent.com/87981867/173344628-57ef282e-a1bd-41ee-a916-c5cf88d1695b.png)
+- SQuAD 2.0은 SQuAD 1.0과 마찬가지로 질문-답변 데이터셋이며 50,000개 이상의 질문-답변 쌍 추가
+- 문서에서 답변이 없는 질문도 포함
+- 하나의 질문에 대해 여러 개의 정답이 가능
+- 질문에 대한 답변을 찾을 수 없는 경우 "is_impossible" 필드를 이용하여 이를 표시
 
-
-## 2. MRC의 종류
-
-### Extractive Answer Datasets
-
-- 질의 (question)에 대한 답이 항상 주어진 지문 (context)의 segment (or span)로 존재
-
-ex) Span Extraction: SQuAD, KorQuAD, NewsQA, Natural Questions, etc
-
-### Descriptive/Narrative Answer Datasets
-
-- 답이 지문 내에서 추출한 span이 아니라, 질의를 보고 생성 된 sentence (or free form)의 형태
-
-ex) MS MARCO (Bajaj et al., 2016), Narrative QA
-
-### Multiple choice Datasets
-
-- 질의에 대한 답을 여러 개의 answer candidates 중 하나로 고르는 형태
-
-ex) MCTest(Richardson et al., 2013), RACE, ARC, etc.
-
-### Extraction-Based MRC
-
-![image](https://user-images.githubusercontent.com/87981867/220810999-2e3b943f-dbc1-494f-8af9-5cdae6092e0d.png)
-
-- 지문(Context) 내 답의 위치를 예측 -> 분류 문제(Classification)
-
-### Generation-Based MRC
-
-![image](https://user-images.githubusercontent.com/87981867/220811026-3d37f14b-33f5-4fd4-9bd9-ebd1ed11432c.png)
-
-- 주어진 지문과 질의(Question)를 보고 답변을 생성 -> 생성 문제(Generation)
-
-### Extraction VS Generation
-
-**(1) Tokenization**
-
-![image](https://user-images.githubusercontent.com/87981867/220811368-4d58ede5-a11e-42cd-9fa5-f6097e31a0ea.png)
-
-- 토크나이저의 경우 WordPiece 방식으로 사용
-- 미국이나 군대같은 단어는 자주 사용되므로 단어 자체가 그대로 토큰으로 유지되지만 직위같은 경우에는 직과 위로 나뉜것을 볼 수 있음
-
-**(2) Special Token**
-
-![image](https://user-images.githubusercontent.com/87981867/220811485-3ffb4b44-bfc0-40f9-85e7-1ce5ab39bae0.png)
-
-- Generation에서 토큰을 사용하는지 또는 텍스트 포맷을 사용하는지는 사용하는 모듈에 달려있
-
-**(3) 출력 표현 - 정답출력**
-
-![image](https://user-images.githubusercontent.com/87981867/220811619-cb12fced-d574-42ef-b49d-ea713afa20e4.png)
-
-
-## 3. 평가 방법
-
-### Exact Match / F1 Score
-
-: 답변이 지문 내에 존재하는 경우 (extractive answer)와 주어진 선택지 중 답을 고르는 경우 (multiple choice answer)에 쓰임
-
-**(1) EM (Exact Match)**
-
-- 예측한 답과 ground-truth이 정확히 일치하는 샘플의 비율
-- 모델이 정답을 정확히 맞춘 비율
-- Accuracy 측정 방식과 유사
-
-![image](https://user-images.githubusercontent.com/87981867/173344742-63a974d0-1d6f-47b5-a13b-02cd00783470.png)
-
-ex) 모범 답변 : 안녕하세요 -> 추론 답변 : 안녕하세요(정답) 
-
-**(2) F1 Score**
-
-- 예측한 답과 ground-truth&사이의 token&overlap을 F1으로 계산
-- 모델이 낸 답안과 정답을 음절 단위로 비교해서 정답과 겹치는 부분을 고려하여 일종의 부분 점수를 인정한 점수
-
-ex) 모범 답변 : 안녕하세요 -> 추론 답변 : 안녕하세(정답인정)
+```json
+# SQuAD 2.0
+{
+  "version": "v2.0",
+  "data": [
+    {
+      "title": "Normans",
+      "paragraphs": [
+        {
+          "qas": [
+            {
+              "question": "In what country is Normandy located?",
+              "id": "56ddde6b9a695914005b9628",
+              "answers": [
+                {
+                  "text": "France",
+                  "answer_start": 159
+                },
+                {
+                  "text": "France",
+                  "answer_start": 159
+                },
+                {
+                  "text": "France",
+                  "answer_start": 159
+                },
+                {
+                  "text": "France",
+                  "answer_start": 159
+                }
+              ],
+              "is_impossible": false
+            },
+            {
+              "question": "When were the Normans in Normandy?",
+              "id": "56ddde6b9a695914005b9629",
+              "answers": [
+                {
+                  "text": "10th and 11th centuries",
+                  "answer_start": 94
+                },
+                {
+                  "text": "in the 10th and 11th centuries",
+                  "answer_start": 87
+                },
+                {
+                  "text": "10th and 11th centuries",
+                  "answer_start": 94
+                },
+                {
+                  "text": "10th and 11th centuries",
+                  "answer_start": 94
+                }
+              ],
+              "is_impossible": false
+            },
+            {
+              "question": "From which countries did the Norse originate?",
+              "id": "56ddde6b9a695914005b962a",
+              "answers": [
+                {
+                  "text": "Denmark, Iceland and Norway",
+                  "answer_start": 256
+                },
+                {
+                  "text": "Denmark, Iceland and Norway",
+                  "answer_start": 256
+                },
+                {
+                  "text": "Denmark, Iceland and Norway",
+                  "answer_start": 256
+                },
+                {
+                  "text": "Denmark, Iceland and Norway",
+                  "answer_start": 256
+                }
+              ],
+              "is_impossible": false
+            },
+            {
+              "question": "Who was the Norse leader?",
+              "id": "56ddde6b9a695914005b962b",
+              "answers": [
+                {
+                  "text": "Rollo",
+                  "answer_start": 308
+                },
+                {
+                  "text": "Rollo",
+                  "answer_start": 308
+                },
+                {
+                  "text": "Rollo",
+                  "answer_start": 308
+                },
+                {
+                  "text": "Rollo",
+                  "answer_start": 308
+                }
+              ],
+              "is_impossible": false
+            },
+            {
+              "question": "What century did the Normans first gain their separate identity?",
+              "id": "56ddde6b9a695914005b962c",
+              "answers": [
+                {
+                  "text": "10th century",
+                  "answer_start": 671
+                },
+                {
+                  "text": "the first half of the 10th century",
+                  "answer_start": 649
+                },
+                {
+                  "text": "10th",
+                  "answer_start": 671
+                },
+                {
+                  "text": "10th",
+                  "answer_start": 671
+                }
+              ],
+              "is_impossible": false
+            },
+            {
+              "plausible_answers": [
+                {
+                  "text": "Normans",
+                  "answer_start": 4
+                }
+              ],
+              "question": "Who gave their name to Normandy in the 1000's and 1100's",
+              "id": "5ad39d53604f3c001a3fe8d1",
+              "answers": [],
+              "is_impossible": true
+            },
+            {
+              "plausible_answers": [
+                {
+                  "text": "Normandy",
+                  "answer_start": 137
+                }
+              ],
+              "question": "What is France a region of?",
+              "id": "5ad39d53604f3c001a3fe8d2",
+              "answers": [],
+              "is_impossible": true
+            },
+            {
+              "plausible_answers": [
+                {
+                  "text": "Rollo",
+                  "answer_start": 308
+                }
+              ],
+              "question": "Who did King Charles III swear fealty to?",
+              "id": "5ad39d53604f3c001a3fe8d3",
+              "answers": [],
+              "is_impossible": true
+            },
+            {
+              "plausible_answers": [
+                {
+                  "text": "10th century",
+                  "answer_start": 671
+                }
+              ],
+              "question": "When did the Frankish identity emerge?",
+              "id": "5ad39d53604f3c001a3fe8d4",
+              "answers": [],
+              "is_impossible": true
+            }
+          ],
+          "context": "The Normans (Norman: Nourmands; French: Normands; Latin: Normanni) were the people who in the 10th and 11th centuries gave their name to Normandy, a region in France. They were descended from Norse (\"Norman\" comes from \"Norseman\") raiders and pirates from Denmark, Iceland and Norway who, under their leader Rollo, agreed to swear fealty to King Charles III of West Francia. Through generations of assimilation and mixing with the native Frankish and Roman-Gaulish populations, their descendants would gradually merge with the Carolingian-based cultures of West Francia. The distinct cultural and ethnic identity of the Normans emerged initially in the first half of the 10th century, and it continued to evolve over the succeeding centuries."
+        },
+        
+                },
+```
