@@ -1,58 +1,80 @@
-# Tab-Transformer
+# LLaMA
 
-## **1. Introduction**
+## Model Architecture
 
-- tabular 데이터에 대해 tree-based 모델이 뛰어난 성능을 보이는 것은 사실이지만, 한계점 또한 분명히 존재
-- tabular 데이터와 image/text를 한 번에 학습시키는 multi-modality를 확보할 수 없고, 스트리밍 데이터에 대해 지속적인 학습 또한 불가능한 측면이 있음
-- 단순한 MLP로 임베딩을 한다고 하면, 그 얕은 구조와 context-free 임베딩이라는 특성 때문에 성능 측면에서 아쉬운 부분이 많음
-- 본 논문에서는 tree-based 모델에 필적하면서도 MLP보다 뛰어난 구조의 알고리즘
+**(1)Pre-normalization (from GPT-3)**
 
-## **2. TabTransformer**
+- 학습 안정성을 개선하기 위해 각 transformer sub-layer의 입력을 normalization함
+- RMSNorm Normalizing 함수 사용
 
-![https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/str.PNG](https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/str.PNG)
+**(2)SwiGLU activation function (from PaLM)**
 
-- `DLRM` 처럼 연속형 변수와 범주형 변수의 처리 방법가 다름
-- 연속형 변수는 **layer normalization**를 거치고 난 후 최종 layer로 바로 투입되는 형태이지만, 범주형 변수의 경우 **Column Embedding** 과정을 거친 후 **Transformer** 구조를 통과 한 후에 최종 layer로 투입 됨
-- Column Embedding은 범주형 변수가 m개가 존재한다고 할 때, 각각의 변수에는 또한 여러 class가 존재하며, Column Embedding을 통과하게 되면, m개의 범주형 변수는 m개의 임베딩 벡터로 변환 됨
-- 만약 길이가 d라고 한다면, 길이 d를 갖는 m개의 벡터를 갖게 될 것
-- i번째 범주형 변수가 di개의 class를 갖고 있다면, 임베딩 테이블 eϕi는 di+1 개의 임베딩을 갖게 되며, 1개가 추가된 것은 결측값에 대응하기 위함임
-- 해당 범주형 변수에 결측값이 많은 경우 별도의 임베딩을 생성하면 되고, 만약 충분하지 않다고 하면 다른 임베딩 벡터의 평균 값 등을 이용할 수도 있음
-- 모든 범주형 변수의 각 class에 대해 독립적인 임베딩 벡터를 만들 수도 있지만, 각 범주형 변수는 분명 다른 특성을 갖게 됨
-- 예를 들어 성별, 직업 이란 2개의 범주형 변수가 있다고 하면, 남성/여성이라는 특성은 분명 직업과는 다른 종류의 의미를 갖고 있을 것이며, 이 때문에 같은 변수 내에서 일부 같은 parameter를 공유하게 설정할 수 있음
-- i 변수의 j class에 대한 변환을 식으로 표현하면 아래와 같음
+- 성능 개선을 위해 ReLU를 SwiGLU로 교체함
 
-![Untitled](https://user-images.githubusercontent.com/87981867/232967382-27203fbc-32e1-4916-8284-f82d57add36b.png)
+**(3)Rotary Embeddings(from GPTNeo)**
 
-- 이 때 c라고 하는 각 변수 내에 존재하는 공유되는 parameter를 어느 정도 비중으로 가져갈 지는 실험의 영역
-- 즉, l은 hyper-parameter에 해당하며, 적정한 l을 찾는 것은 실험으로 해결해야하는 부분이지만 논문에서는 1/4 또는 1/8이 가장 적절한 비율이라고 판단
-- tabular 데이터에서는 변수 간 순서라는 것이 존재하지 않는 경우가 많기 때문에, positional encoding을 쓰는 대신 이런 식으로 다른 중요한 정보를 활용할 수 있음
-- 이렇게 Column Embedding을 통해 생성된 벡터는 Transformer layer를 통과하게 되고, 통과한 결과물은 아래와 같이 표현할 수 있음
+- 절대적인 positional embeddings을 제거하고 RoPE(Rotary Postional Embedding)을 사용함
 
-![Untitled2](https://user-images.githubusercontent.com/87981867/232967400-34ba6f58-f34a-4f4c-a191-c202d8727651.png)
+## Optimization Hyper-Parameters
 
-- 이 벡터들을 **Contextualized Embedding**이라고 부르며, top MLP에 투입되기 전 연속형 변수인 xcont 와 합쳐지게 되고, 이 concatenated 벡터의 차원은 (d∗m+c)
-- top MLP를 거치면 최종 output이 산출
+Meta는 LLaMA 학습에 AdamW optimizer를 사용
 
-## **3. Experiments**
+**AdamW optimizer**
 
-- 기본적인 MLP와의 성능 비교는 아래와 같음
+- hyper-parameters: beta1=0.9, beta2=0.95
+- weight decay = 0.1, gradient clipping = 1.0
+- 2000 warmup steps
 
-![https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/01.PNG](https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/01.PNG)
+![https://miro.medium.com/v2/resize:fit:875/1*YfxWGIvYlrXS-eBHEkcXvw.png](https://miro.medium.com/v2/resize:fit:875/1*YfxWGIvYlrXS-eBHEkcXvw.png)
 
-- noisy 데이터와 결측값이 있는 데이터에 대해서도 `TabTransformer`는 기본적인 MLP 보다 더 높은 성능을 보여줌(robust)
+## 데이터셋
 
-![https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/TWO.PNG](https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/TWO.PNG)
+- Meta AI는 LLaMA 학습을 위해 다른 LLMs의 학습 데이터 소스를 재사용(총 4.75 TB)
+- Wikipedia의 경우, 2022년 6월~8월까지의 20개국(bg, ca, cs, da, de, en, es, fr, hr, hu, it, nl, pl, pt, ro, ru, sl, sr, sv, uk) 데이터로 한국어는 제외
 
-- 지도 학습 상의 모델 성능을 보면, `TabTransformer`는 GBDT에 필적하는 성능을 보임을 알 수 있음
+![https://miro.medium.com/v2/resize:fit:480/1*oGc-8V9H7TkMJSA5jNe8bw.png](https://miro.medium.com/v2/resize:fit:480/1*oGc-8V9H7TkMJSA5jNe8bw.png)
 
-![https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/03.PNG](https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/03.PNG)
+- BPE(Byte Pair Encoding) 알고리즘으로 데이터를 토큰화하였으며, 토큰화 후에 전체 학습 데이터셋은 1.4 T tokens을 포함
+- 각 토큰은 거의 한 번만 학습되었으며, Wikipedia와 Books 데이터셋은 2 epoch 학습
 
-- 부록에 보면 Column Embedding에서 cϕi의 비율에 대한 실험이 나오는데, Transformer Layer의 수에 따라 조금씩 다르지만 보통 1/4 ~ 1/8의 비율이 높은 성능을 보여줌을 알 수 있음
-- Column Embedding이 아예 없는 경우가 제일 좋지 않은 성능을 보여준 것도 확인해 봐야할 점
+## 예제
 
-![https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/04.PNG](https://greeksharifa.github.io/public/img/Machine_Learning/2022-03-13-tab-transformer/04.PNG)
+llama origin(LLaMA) : [https://github.com/facebookresearch/l...](https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqazJJUjVFSU5lcW5aMk9tc0NabU1SZW1rOWRKd3xBQ3Jtc0ttMjNJSXBUSUR6cHpLLUgtVVNtOE9JZUJIdmUzT19FVVp3ZVczM2w1QnVJcGpmY1FuTERZaVoybGZTWUVPUUtLR2JxSDhBOFRwaFY4aXV1b3Vub0Iwci1VWVdiVEhZYUZ1ZDA1bHVVcnZJYXhOUVdESQ&q=https%3A%2F%2Fgithub.com%2Ffacebookresearch%2Fllama&v=jvYpv9VJBOA)
 
-## **4. Conclusion**
+llama-hf(LLaMA-Small) : [https://github.com/ypeleg/llama](https://www.youtube.com/redirect?event=video_description&redir_token=QUFFLUhqbUsxUTJSWE1YQ1RwTFczejNzVlJvOUxwYzZZUXxBQ3Jtc0ttd19qSmY4WklwOFNxNkQ5Rk5sUF9kSi1wSHpqR2wtRlIzaGVxQmtwd2NSRGdYS3Jqbm0zbVM4NFlwM1RzWUhkRDZES0VVc19mN2hMUEdacjlNUW0yVlBnMnlua2VyU09mSTZ4dzk5X3FZY1VORUh2bw&q=https%3A%2F%2Fgithub.com%2Fypeleg%2Fllama&v=jvYpv9VJBOA)
 
-- `TabTransformer`는 tabular 데이터를 이용한 딥러닝 알고리즘으로 MLP, GBDT에 비해 차별화된 장점을 갖고 있는 방법론
-- 다양한 유형의 데이터를 소화할 수 있으면서도 안정적인 성능을 낼 수 있는 알고리즘으로 평가할 수 있음
+**LLaMA-Small**
+```python
+# inference_example.py
+MODEL = 'decapoda-research/llama-7b-hf'
+
+tokenizer = llama.LLaMATokenizer.from_pretrained(MODEL)
+model = llama.LLaMAForCausalLM.from_pretrained(MODEL, low_cpu_mem_usage = True)
+model.to('cuda')
+
+batch = tokenizer("Paris is the capital of France", return_tensors = "pt")
+print(tokenizer.decode(model.generate(batch["input_ids"].cuda(), max_length=100)[0]))
+```
+```
+Paris is the capital of France and the most populous city in the country. It is situated on the river Seine, in northern France, at the heart of the Île-de-France region. The city of Paris, within its administrative limits (the 20 arrondissements), has approximately 2,2 million inhabitants. The Paris metropolitan area has more than 12 million inhabitants, and is one of the most populated metropolitan areas in Europe.
+Paris
+```
+
+```python
+# test.py
+model_name = "decapoda-research/llama-13b-hf"
+tokenizer = LLaMATokenizer.from_pretrained(model_name)
+model = LLaMAForCausalLM.from_pretrained(model_name, low_cpu_mem_usage=True)
+
+prompt = "표정이 안 좋아 보이는데 나랑 얘기좀 할까?"
+inputs = tokenizer(prompt, return_tensors="pt")
+
+# Generate
+generate_ids = model.generate(inputs.input_ids, max_length=100)
+a = tokenizer.batch_decode(generate_ids, skip_special_tokens=True, clean_up_tokenization_spaces=False)[0]
+print(a)
+```
+```
+표정이 안 좋아 보이는데 나랑 얘기좀 할까?
+저는 저는 저는 저는 저는 저는 저는 저는 저는 저는 저는
+```
