@@ -1,10 +1,11 @@
-## [연구 개발 노트]
+## R&D Note
 
 #### NLP(Natural Language Processing)
 - [Morphological Analysis]()
 - [Question Answering]()
 - [Information Retrieval]()
 - [Text Summarization]()
+- [Text-to-Table]()
 
 #### Model
 - [ElectraSpacer](https://github.com/jaeyeongs/research-develpoment/tree/main/Model/ElectraSpacer)
